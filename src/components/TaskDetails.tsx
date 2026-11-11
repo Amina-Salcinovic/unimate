@@ -1,3 +1,5 @@
+import { FontSize, Radius, Spacing } from '@/constants/theme';
+import { useTheme } from '@/hooks/use-theme';
 import type { Task } from '@/types';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -6,85 +8,98 @@ type TaskDetailsProps = {
 };
 
 export const TaskDetails = ({ task }: TaskDetailsProps) => {
+  const theme = useTheme();
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{task.title}</Text>
-        <Text style={styles.course}>{task.course}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>Status:</Text>
-        <Text style={styles.value}>
-          {task.isCompleted ? '✓ Completed' : '⏳ Pending'}
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>Priority:</Text>
-        <Text style={[styles.value, styles.priorityText]}>
-          {task.priority.toUpperCase()}
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>Due Date:</Text>
-        <Text style={styles.value}>{task.dueDate}</Text>
-      </View>
-
-      {task.description ? (
-        <View style={styles.section}>
-          <Text style={styles.label}>Description:</Text>
-          <Text style={styles.description}>{task.description}</Text>
+    <ScrollView contentContainerStyle={[styles.scrollContainer, { backgroundColor: theme.background }]}>
+      <View style={[styles.content, { backgroundColor: theme.card, borderColor: theme.border }]}>
+        <View style={styles.header}>
+          <Text style={[styles.title, { color: theme.text }]}>{task.title}</Text>
+          <Text style={[styles.course, { color: theme.primary }]}>{task.course}</Text>
         </View>
-      ) : null}
+
+        <View style={styles.row}>
+          <Text style={[styles.label, { color: theme.muted }]}>Status</Text>
+          <Text style={[styles.value, { color: task.isCompleted ? theme.success : theme.warning }]}>
+            {task.isCompleted ? '✓ Completed' : '⏳ Pending'}
+          </Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={[styles.label, { color: theme.muted }]}>Priority</Text>
+          <Text style={[styles.value, { color: theme.text, fontWeight: 'bold' }]}>
+            {task.priority.toUpperCase()}
+          </Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={[styles.label, { color: theme.muted }]}>Due Date</Text>
+          <Text style={[styles.value, { color: theme.text }]}>{task.dueDate}</Text>
+        </View>
+
+        {task.description ? (
+          <View style={styles.descriptionSection}>
+            <Text style={[styles.label, { color: theme.muted }]}>Description</Text>
+            <Text style={[styles.descriptionText, { color: theme.text }]}>{task.description}</Text>
+          </View>
+        ) : null}
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#ffffff',
+  scrollContainer: {
+    padding: Spacing.md,
     flexGrow: 1,
   },
+  content: {
+    width: '100%',
+    maxWidth: 600,
+    alignSelf: 'center',
+    padding: Spacing.lg,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+  },
   header: {
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    paddingBottom: 12,
+    marginBottom: Spacing.lg,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#ccc',
   },
   title: {
-    fontSize: 22,
+    fontSize: FontSize.hero,
     fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   course: {
-    fontSize: 16,
-    color: '#4f46e5',
+    fontSize: FontSize.body,
     fontWeight: '600',
   },
-  section: {
-    marginBottom: 16,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
   },
   label: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    color: '#6b7280',
+    fontSize: FontSize.small,
     textTransform: 'uppercase',
-    marginBottom: 4,
+    fontWeight: '600',
   },
   value: {
-    fontSize: 16,
-    color: '#1f2937',
+    fontSize: FontSize.body,
+    flexShrink: 1,
   },
-  priorityText: {
-    fontWeight: 'bold',
+  descriptionSection: {
+    marginTop: Spacing.sm,
+    paddingTop: Spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#ccc',
   },
-  description: {
-    fontSize: 15,
-    color: '#374151',
+  descriptionText: {
+    fontSize: FontSize.body,
+    marginTop: Spacing.xs,
     lineHeight: 22,
   },
 });

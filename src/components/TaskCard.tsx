@@ -1,130 +1,120 @@
+import React from 'react';
+import { View, Text, StyleSheet, Pressable, type StyleProp, type ViewStyle } from 'react-native';
 import type { Task } from '@/types';
-import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '@/hooks/use-theme';
+import { Spacing, FontSize, Radius } from '@/constants/theme';
 
 type TaskCardProps = {
   task: Task;
+  style?: StyleProp<ViewStyle>;
 };
 
-export const TaskCard = ({ task }: TaskCardProps) => {
-  const getPriorityColor = (priority: Task['priority']) => {
-    switch (priority) {
+export const TaskCard = ({ task, style }: TaskCardProps) => {
+  const theme = useTheme();
+
+  const getPriorityColor = () => {
+    switch (task.priority) {
       case 'high':
-        return '#ef4444';
+        return theme.danger;
       case 'medium':
-        return '#f59e0b';
+        return theme.warning;
       case 'low':
-        return '#10b981';
+        return theme.success;
       default:
-        return '#6b7280';
+        return theme.primary;
     }
   };
 
   return (
-    <View style={[styles.card, task.isCompleted && styles.completedCard]}>
-      <View style={styles.header}>
-        <Text style={[styles.title, task.isCompleted && styles.completedText]}>
+    <Pressable
+      style={({ pressed }) => [
+        styles.card,
+        {
+          backgroundColor: theme.card,
+          borderColor: theme.border,
+          opacity: task.isCompleted ? 0.6 : pressed ? 0.9 : 1,
+        },
+        style,
+      ]}
+    >
+      <View style={styles.cardHeader}>
+        <Text style={[styles.title, { color: theme.text }, task.isCompleted && styles.completedTitle]}>
           {task.title}
         </Text>
-        <View
-          style={[
-            styles.priorityBadge,
-            { backgroundColor: getPriorityColor(task.priority) },
-          ]}
-        >
-          <Text style={styles.priorityText}>{task.priority.toUpperCase()}</Text>
-        </View>
+        <Text style={[styles.badge, { backgroundColor: getPriorityColor(), color: '#ffffff' }]}>
+          {task.priority.toUpperCase()}
+        </Text>
       </View>
 
-      <Text style={styles.course}>{task.course}</Text>
+      <Text style={[styles.course, { color: theme.primary }]}>{task.course}</Text>
 
-      {task.description && (
-        <Text style={styles.description} numberOfLines={2}>
+      {task.description ? (
+        <Text style={[styles.description, { color: theme.muted }]} numberOfLines={2}>
           {task.description}
         </Text>
-      )}
+      ) : null}
 
-      <View style={styles.footer}>
-        <Text style={styles.dueDate}>Due: {task.dueDate}</Text>
-        <Text style={styles.status}>
+      <View style={[styles.footer, { borderTopColor: theme.border }]}>
+        <Text style={[styles.date, { color: theme.muted }]}>Due: {task.dueDate}</Text>
+        <Text style={[styles.status, { color: task.isCompleted ? theme.success : theme.warning }]}>
           {task.isCompleted ? '✓ Completed' : '⏳ Pending'}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    borderLeftWidth: 5,
-    borderLeftColor: '#4f46e5',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    padding: Spacing.md,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    marginBottom: Spacing.md,
+    position: 'relative',
   },
-  completedCard: {
-    opacity: 0.6,
-    backgroundColor: '#f9fafb',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+  cardHeader: {
+    paddingRight: 60, 
   },
   title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    flex: 1,
-    marginRight: 8,
+    fontSize: FontSize.body,
+    fontWeight: '700',
+    marginBottom: Spacing.xs,
   },
-  completedText: {
+  completedTitle: {
     textDecorationLine: 'line-through',
   },
-  priorityBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  priorityText: {
-    color: '#ffffff',
-    fontSize: 10,
+  badge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    borderRadius: Radius.pill,
+    fontSize: FontSize.small - 2,
     fontWeight: 'bold',
+    overflow: 'hidden',
   },
   course: {
-    fontSize: 13,
-    color: '#4f46e5',
+    fontSize: FontSize.small,
     fontWeight: '600',
-    marginBottom: 6,
+    marginBottom: Spacing.xs,
   },
   description: {
-    fontSize: 14,
-    color: '#4b5563',
-    marginBottom: 10,
+    fontSize: FontSize.small,
+    marginBottom: Spacing.sm,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 4,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#f3f4f6',
+    paddingTop: Spacing.sm,
+    marginTop: Spacing.xs,
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
-  dueDate: {
-    fontSize: 12,
-    color: '#6b7280',
+  date: {
+    fontSize: FontSize.small,
   },
   status: {
-    fontSize: 12,
+    fontSize: FontSize.small,
     fontWeight: '600',
-    color: '#374151',
   },
-}); 
+});
