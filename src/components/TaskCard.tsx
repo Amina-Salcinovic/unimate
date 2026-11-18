@@ -1,15 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, type StyleProp, type ViewStyle } from 'react-native';
-import type { Task } from '@/types';
+import { FontSize, Radius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { Spacing, FontSize, Radius } from '@/constants/theme';
+import type { Task } from '@/types';
+import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 
 type TaskCardProps = {
   task: Task;
   style?: StyleProp<ViewStyle>;
+  onLongPress?: () => void;
 };
 
-export const TaskCard = ({ task, style }: TaskCardProps) => {
+export const TaskCard = ({ task, style, onLongPress }: TaskCardProps) => {
   const theme = useTheme();
 
   const getPriorityColor = () => {
@@ -27,6 +27,11 @@ export const TaskCard = ({ task, style }: TaskCardProps) => {
 
   return (
     <Pressable
+      onLongPress={onLongPress}
+      android_ripple={{ color: theme.border }}
+      accessibilityRole="button"
+      accessibilityLabel={`${task.title}, ${task.course}, due ${task.dueDate}, ${task.priority} priority, ${task.isCompleted ? 'completed' : 'pending'}`}
+      accessibilityHint="Long press to delete"
       style={({ pressed }) => [
         styles.card,
         {
@@ -69,7 +74,6 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: Radius.md,
     borderWidth: 1,
-    marginBottom: Spacing.md,
     position: 'relative',
   },
   cardHeader: {
